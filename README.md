@@ -1,4 +1,4 @@
-# 🛡️ Aegis
+# Aegis
 **High-Performance Edge Delta Engine**  
 _Sub-millisecond state differentiation and event squashing for high-scale retail ecosystems._
 
@@ -20,13 +20,13 @@ Traditional systems broadcast full object state every time anything changes.
 
 ### This causes:
 
-- 🔁 **Redundancy**  
+- **Redundancy**  
   If price stays the same but gets sent 100 times → 100 useless operations downstream.
 
-- 🌐 **Network Bloat**  
+- **Network Bloat**  
   Sending a 2KB object when only a 4-byte price changed = massive waste.
 
-- 🗄 **Database Contention**  
+- **Database Contention**  
   Downstream services must “read-before-write” just to check if change is real.
 
 Result: Higher latency. DB overload. Slower systems.
@@ -37,17 +37,17 @@ Result: Higher latency. DB overload. Slower systems.
 
 Aegis uses a **Sieve Architecture** — data gets refined layer by layer.
 
-### 1️⃣ Ingress — The Disruptor
+### 1️ Ingress — The Disruptor
 - Lock-free Ring Buffer
 - Handles 1M+ events/sec
 - Non-blocking network ingestion
 
-### 2️⃣ State Comparator — The Engine
+### 2️ State Comparator — The Engine
 - Thread-safe in-memory snapshot store
 - Bitmask-based delta detection
 - O(1) field change evaluation
 
-### 3️⃣ Egress — The Filter
+### 3️ Egress — The Filter
 - Emits event only if `deltaMask != 0`
 - Suppresses redundant updates
 - Outputs lightweight delta events
@@ -110,10 +110,10 @@ Pre-allocate objects or use primitive arrays.
 
 Aegis acts as a **Circuit Breaker for Data**.
 
-### 🔹 Change Suppression
+###  Change Suppression
 If incoming value matches cached state → event dropped.
 
-### 🔹 Field-Level Targeting
+###  Field-Level Targeting
 Instead of emitting:
 
 ```text
@@ -128,7 +128,7 @@ PriceChangedEvent
 
 Downstream services can route intelligently without hitting the main database.
 
-### 🔹 Temporal Collapsing
+###  Temporal Collapsing
 If 10 updates arrive within 1ms:
 - Collapse into final state
 - Emit only the final delta
@@ -171,9 +171,9 @@ Small. Focused. Actionable.
 
 ## 7. Performance Benchmarks (Projected)
 
-- 🚀 Throughput: > 1.2 million updates/sec (16-core JVM)
-- ⚡ Latency (P99): < 0.5 ms (Ingress → Egress)
-- 🧠 Memory: ~400 bytes per product  
+-  Throughput: > 1.2 million updates/sec (16-core JVM)
+-  Latency (P99): < 0.5 ms (Ingress → Egress)
+-  Memory: ~400 bytes per product  
   1M products ≈ 400MB RAM
 
 ---
