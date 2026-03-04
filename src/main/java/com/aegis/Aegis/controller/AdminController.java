@@ -17,6 +17,24 @@ public class AdminController {
     
     private final ProductUpdateConsumer productUpdateConsumer;
     private final StateStore stateStore;
+
+    @GetMapping("/")
+    public ResponseEntity<Map<String, Object>> root() {
+        return ResponseEntity.ok(Map.of(
+                "service", "Aegis - High-Performance Edge Delta Engine",
+                "version", "1.0.0",
+                "status", "running",
+                "endpoints", Map.of(
+                        "admin", "/api/v1/admin",
+                        "health", "/actuator/health",
+                        "metrics", "/actuator/metrics"
+                ),
+                "stats", Map.of(
+                        "productsInStore", stateStore.size(),
+                        "bufferSize", productUpdateConsumer.getBufferSize()
+                )
+        ));
+    }
     
     @PostMapping("/products")
     public ResponseEntity<Map<String, Object>> ingestProduct(@RequestBody ProductState productState) {
