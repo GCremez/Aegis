@@ -7,7 +7,6 @@ WORKDIR /app
 # Copy Maven wrapper files
 COPY .mvn .mvn
 COPY mvnw .
-COPY mvnw.cmd .
 
 # Make mvnw executable (important for Unix systems)
 RUN chmod +x mvnw
@@ -50,46 +49,7 @@ EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
-```
-
-## Key Changes Made:
-
-1. **Line 8-10**: Fixed COPY commands to properly copy `.mvn` directory
-2. **Line 13**: Added `chmod +x mvnw` to make it executable
-3. **Line 16**: Copy `pom.xml` separately for better caching
-4. **Line 19**: Added `-B` flag for batch mode (cleaner logs)
-5. **Line 38**: Fixed JAR copy to use wildcard pattern
-
-## Update Your `.dockerignore`
-
-Make sure your `.dockerignore` looks like this:
-```
-# Build artifacts
-target/
-*.class
-
-# IDE files
-.idea/
-*.iml
-.vscode/
-.settings/
-.project
-.classpath
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Git (but keep .mvn)
-.git/
-
-# Logs
-*.log
-logs/
-
-# Test output
-test-output/
+# Run the application with proper port binding
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar app.jar"]
