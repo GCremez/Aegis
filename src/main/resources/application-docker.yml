@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+aegis:
+  disruptor:
+    buffer-size: 65536
+    wait-strategy: blocking
+  kafka:
+    bootstrap-servers: kafka:29092
+    topic: delta-events
+    producer:
+      acks: 1
+      linger-ms: 5
+      compression-type: lz4
+
+spring:
+  kafka:
+    bootstrap-servers: kafka:29092
+    producer:
+      bootstrap-servers: kafka:29092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: kafka:29092
+      group-id: aegis-consumer-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+logging:
+  level:
+    com.aegis.Aegis: DEBUG
+    org.springframework.kafka: INFO
+    org.apache.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/aegis-docker.log
