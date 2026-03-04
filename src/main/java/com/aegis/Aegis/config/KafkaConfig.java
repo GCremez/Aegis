@@ -1,15 +1,16 @@
 package com.aegis.Aegis.config;
 
+import org.apache.kafka.clients.consumer.Consumer;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @Configuration
 @EnableKafka
@@ -55,6 +56,19 @@ public class KafkaConfig {
     @Bean
     public KafkaTemplate<String, com.aegis.Aegis.model.DeltaEvent> deltaEventKafkaTemplate() {
         return new KafkaTemplate<>(deltaEventProducerFactory());
+    }
+
+    @Bean
+    public ConsumerFactory<String, Object>ConsumerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put("bootstrap.servers", bootstrapServers);
+        configProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        configProps.put("value.deserializer", "org.springframework.kafka.support.serializer.JsonDeserializer");
+        configProps.put("group.id", "aegis-consumer-group");
+        configProps.put("auto.offset.reset", "earliest");
+        configProps.put("enable.auto.commit", "false");
+
+        return new DefaultKafkaConsumerFactory<>(configProps);
     }
     
     // Getters and Setters
