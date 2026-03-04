@@ -1,6 +1,7 @@
 package com.aegis.Aegis.controller;
 
 import com.aegis.Aegis.egress.DeltaEventProducer;
+import com.aegis.Aegis.egress.DeltaEventConsumer;
 import com.aegis.Aegis.ingress.ProductUpdateConsumer;
 import com.aegis.Aegis.state.StateStore;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class MetricsController {
     private final ProductUpdateConsumer productUpdateConsumer;
     private final DeltaEventProducer deltaEventProducer;
     private final StateStore stateStore;
+    private final DeltaEventConsumer deltaEventConsumer;
     
     @GetMapping
     public ResponseEntity<Map<String, Object>> getMetrics() {
@@ -35,6 +37,10 @@ public class MetricsController {
                 "errorCount", deltaEventProducer.getErrorCount(),
                 "isRunning", deltaEventProducer.isRunning()
             ),
+            "consumer", Map.of(
+                "consumedCount", deltaEventConsumer.getConsumedCount(),
+                "errorCount", deltaEventConsumer.getErrorCount()
+            ),
             "state", Map.of(
                 "storeSize", stateStore.size(),
                 "totalUpdates", stateStore.getTotalUpdates(),
@@ -47,11 +53,15 @@ public class MetricsController {
     public ResponseEntity<Map<String, Object>> getThroughput() {
         long processed = productUpdateConsumer.getProcessedCount();
         long produced = deltaEventProducer.getProducedCount();
+        long consumed = deltaEventConsumer.getConsumedCount();
         
         return ResponseEntity.ok(Map.of(
             "eventsProcessed", processed,
             "eventsProduced", produced,
-            "efficiency", processed > 0 ? (double) produced / processed : 0.0,
+            "eventsConsumed", consumed,
+            "producerEfficiency", processed > 0 ? (double) produced / processed : 0.0,
+            "consumerEfficiency", produced > 0 ? (double) consumed / produced : 0.0,
+            "overallEfficiency", processed > 0 ? (double) consumed / processed : 0.0,
             "timestamp", System.currentTimeMillis()
         ));
     }
