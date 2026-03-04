@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: 1
+      linger-ms: 0
+      compression-type: lz4
+
+logging:
+  level:
+    com.aegis.Aegis: DEBUG
+    org.springframework.kafka: INFO
+
+aegis:
+  disruptor:
+    buffer-size: 65536
+    consumer-threads: 1
+    producer-threads: 1
+  kafka:
+    bootstrap-servers: localhost:9092
+    topic: delta-events
+    acks: 1
+    linger-ms: 0
+    compression-type: lz4
+  temporal-collapsing:
+    window-ms: 1
