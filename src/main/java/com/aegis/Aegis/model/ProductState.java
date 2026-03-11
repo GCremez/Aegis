@@ -3,6 +3,7 @@ package com.aegis.Aegis.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +14,7 @@ public class ProductState {
     private int price;
     private int stock;
     private String warehouse;
+    @JsonDeserialize(using = LenientLongDeserializer.class)
     private long lastUpdated;
     
     public int calculateDeltaMask(ProductState previousState) {
