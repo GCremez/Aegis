@@ -11,30 +11,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      zookeeper:
-        image: confluentinc/cp-zookeeper:7.4.0
-        env:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-        ports:
-          - 2181:2181
-          
-      kafka:
-        image: confluentinc/cp-kafka:7.4.0
-        env:
-          KAFKA_BROKER_ID: 1
-          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-          KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-          KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-          KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-        ports:
-          - 9092:9092
-        depends_on: [zookeeper]
-
     steps:
     - uses: actions/checkout@v4
     
@@ -53,8 +29,6 @@ jobs:
         
     - name: Run tests
       run: mvn clean test -Dspring.profiles.active=test
-      env:
-        SPRING_KAFKA_BOOTSTRAP_SERVERS: localhost:9092
       
     - name: Generate test report
       uses: dorny/test-reporter@v1
