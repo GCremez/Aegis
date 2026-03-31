@@ -34,7 +34,7 @@ jobs:
       run: mvn clean package -DskipTests
       
     - name: Build Docker image
-      run: docker build -t aegis:${{ github.sha }} .
+      run: docker build -t aegis:${{ github.sha }} ${{ github.workspace }}
       
     - name: Run integration tests
       run: |
