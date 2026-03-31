@@ -35,7 +35,6 @@ build/
 ### Logs ###
 logs/
 *.log
-/src/main/resources/application.yml
 /src/main/resources/logback.xml
 
 ### Environment and Configuration ###

@@ -1,0 +1,26 @@
+server:
+  port: ${PORT:8080}
+
+# Disable Kafka for standalone deployment
+spring:
+  kafka:
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+
+aegis:
+  disruptor:
+    buffer-size: 65536
+    wait-strategy: blocking
+  # Override Kafka settings for standalone mode
+  kafka:
+    enabled: false
+    bootstrap-servers: ""
+    topic: ""
+
+logging:
+  level:
+    com.aegis.Aegis: INFO
+    root: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
