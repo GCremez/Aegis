@@ -25,8 +25,8 @@ jobs:
         env:
           KAFKA_BROKER_ID: 1
           KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092,PLAINTEXT_HOST://localhost:9092
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
           KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
           KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
           KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
@@ -52,7 +52,9 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
         
     - name: Run tests
-      run: mvn clean test
+      run: mvn clean test -Dspring.profiles.active=test
+      env:
+        SPRING_KAFKA_BOOTSTRAP_SERVERS: localhost:9092
       
     - name: Generate test report
       uses: dorny/test-reporter@v1
