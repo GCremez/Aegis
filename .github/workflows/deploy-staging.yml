@@ -30,8 +30,6 @@ jobs:
         tags: |
           ghcr.io/gcremez/aegis:staging
           ghcr.io/gcremez/aegis:${{ github.sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
         
     - name: Deploy to staging environment
       run: |

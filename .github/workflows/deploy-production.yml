@@ -31,8 +31,6 @@ jobs:
           ghcr.io/gcremez/aegis:latest
           ghcr.io/gcremez/aegis:${{ github.sha }}
           ghcr.io/gcremez/aegis:v${{ github.run_number }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
         
     - name: Deploy to production
       run: |
