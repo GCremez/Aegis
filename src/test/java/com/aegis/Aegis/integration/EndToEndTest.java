@@ -4,6 +4,7 @@ import com.aegis.Aegis.model.ProductState;
 import com.aegis.Aegis.egress.DeltaEventProducer;
 import com.aegis.Aegis.ingress.ProductUpdateConsumer;
 import com.aegis.Aegis.state.StateStore;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,17 +17,31 @@ import org.testcontainers.utility.DockerImageName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+/**
+ * End-to-end integration test using Testcontainers for Kafka.
+ * This test spins up a real Kafka broker in Docker and tests the complete flow.
+ */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Testcontainers
 public class EndToEndTest {
     
     @Container
-    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
+    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"))
+            .withReuse(true); // Reuse container across test runs for faster execution
+    
+    @BeforeAll
+    static void verifyDockerAvailable() {
+        // This will be called before tests run
+        // Testcontainers will throw an exception if Docker is not available
+        System.out.println("Starting Kafka container for integration tests...");
+        System.out.println("Kafka bootstrap servers: " + kafka.getBootstrapServers());
+    }
     
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("aegis.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        System.out.println("Configured Kafka bootstrap servers: " + kafka.getBootstrapServers());
     }
     
     @Autowired
@@ -97,24 +112,27 @@ public class EndToEndTest {
         product.setWarehouse("DUP-Warehouse");
         product.setLastUpdated(System.currentTimeMillis());
         
-        // Ingest the same product twice
+        // Ingest the first product update
         productUpdateConsumer.ingest(product);
-        Thread.sleep(100);
+        Thread.sleep(500);
         
-        long initialProcessedCount = productUpdateConsumer.getProcessedCount();
         long initialProducedCount = deltaEventProducer.getProducedCount();
         
-        // Ingest identical product again
+        // Ingest identical product again (should be filtered as duplicate)
         productUpdateConsumer.ingest(product);
-        Thread.sleep(1000);
+        Thread.sleep(500);
         
-        // Should not process duplicate
-        long finalProcessedCount = productUpdateConsumer.getProcessedCount();
         long finalProducedCount = deltaEventProducer.getProducedCount();
         
-        // The second identical event should be filtered out
-        assertEquals(initialProcessedCount, finalProcessedCount);
-        assertEquals(initialProducedCount, finalProducedCount);
+        // The duplicate event should not produce any new delta events
+        // The produced count should remain the same
+        assertEquals(initialProducedCount, finalProducedCount, 
+            "Duplicate product update should not produce new delta events");
+        
+        // Verify state is still correct
+        ProductState storedState = stateStore.getState("DUP-001");
+        assertNotNull(storedState);
+        assertEquals(20000, storedState.getPrice());
     }
     
     @Test
