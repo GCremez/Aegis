@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.Objects;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,7 +31,7 @@ public class ProductState {
             deltaMask |= FieldMask.ID_MASK;
         }
         
-        if (!this.name.equals(previousState.name)) {
+        if ((!Objects.equals(this.name, previousState.name))) {
             deltaMask |= FieldMask.NAME_MASK;
         }
         
