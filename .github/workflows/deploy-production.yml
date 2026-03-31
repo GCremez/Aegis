@@ -47,13 +47,8 @@ jobs:
         # For example: curl -f https://api.your-domain.com/api/v1/health
         
     - name: Notify deployment
-      uses: 8398a7/action-slack@v3
       if: always()
-      with:
-        status: ${{ job.status }}
-        channel: '#deployments'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        text: |
-          Production deployment ${{ job.status }}
-          Commit: ${{ github.sha }}
-          Branch: ${{ github.ref_name }}
+      run: |
+        echo "Deployment completed with status: ${{ job.status }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
